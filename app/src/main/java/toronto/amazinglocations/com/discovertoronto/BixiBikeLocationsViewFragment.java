@@ -31,6 +31,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
+import toronto.amazinglocations.com.discovertoronto.misc.BikeLocationsArrayList;
+import toronto.amazinglocations.com.discovertoronto.misc.BikesLocationReaderAsyncTask;
+
 public class BixiBikeLocationsViewFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
     private static final String CLASS = BixiBikeLocationsViewFragment.class.getSimpleName();
     private static BikeLocationsArrayList sBikeStandLocationLatLngPairs = null;

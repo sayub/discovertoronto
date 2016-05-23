@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
+import toronto.amazinglocations.com.discovertoronto.misc.PointsOfInterestListViewArrayAdapter;
+
 public class PointsOfInterestListViewFragment extends Fragment {
     private int[] mPointsOfInterestImages = {
             R.drawable.aquarium, R.drawable.artgalleryontario, R.drawable.cntower,

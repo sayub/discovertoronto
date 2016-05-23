@@ -1,4 +1,4 @@
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.misc;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
