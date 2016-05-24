@@ -168,9 +168,14 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
     }
 
     public void terminateGoogleApiClient(){
+        if (mGoogleApiClient == null) {
+            return;
+        }
+
         if(mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
+            mGoogleApiClient = null;
         }
     }
 

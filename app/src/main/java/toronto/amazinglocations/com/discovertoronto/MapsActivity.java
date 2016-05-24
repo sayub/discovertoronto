@@ -1,9 +1,12 @@
 package toronto.amazinglocations.com.discovertoronto;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.location.Location;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -19,12 +22,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import toronto.amazinglocations.com.discovertoronto.misc.LocationEnabledChecker;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    private static final int ENABLE_LOCATION_REQUEST = 1;  // The request code.
+    private boolean wasLocationSettingsActivityVisible = false;
     private GoogleMap mMap;
     private Location mLastLocation;
     private LatLngBounds.Builder mBuilder;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient = null;
     private LocationRequest mLocationRequest;
     private String mName;
     private double mLat;
@@ -35,7 +41,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+    }
 
+    protected void onResume() {
+        super.onResume();
+
+        boolean isLocationEnabled = LocationEnabledChecker.isLocationEnabled(this);
+        // If Google location is not enabled, need to show the Activity from which user can enable it.
+        if (!isLocationEnabled && !wasLocationSettingsActivityVisible) {
+            Toast.makeText(this, getResources().getString(R.string.gps_network_not_enabled), Toast.LENGTH_LONG).show();
+            Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivityForResult(locationSettingsIntent, ENABLE_LOCATION_REQUEST);
+            return;
+        }
+        // Otherwise if location is enabled, continue.
+        else if (isLocationEnabled) {
+            wasLocationSettingsActivityVisible = false;
+            enableActivity();
+        }
+        else {
+            finish();
+        }
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // If location settings Activity was visible, the boolean flag would be true.
+        if (requestCode == ENABLE_LOCATION_REQUEST) {
+            wasLocationSettingsActivityVisible = true;
+        }
+    }
+
+    protected void enableActivity() {
         Bundle bundle = getIntent().getExtras();
         mName = bundle.getString("name");
         mLat = bundle.getDouble("lat");
@@ -106,9 +142,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void terminateGoogleApiClient(){
-        if(mGoogleApiClient.isConnected()) {
+        if (mGoogleApiClient == null) {
+            return;
+        }
+
+        if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
+            mGoogleApiClient = null;
         }
     }
 

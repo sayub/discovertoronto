@@ -13,6 +13,10 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_webview);
+    }
+
+    protected void onResume() {
+        super.onResume();
 
         String url = getIntent().getExtras().getString("url");
 

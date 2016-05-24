@@ -120,9 +120,14 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
     }
 
     public void terminateGoogleApiClient(){
+        if (mGoogleApiClient == null) {
+            return;
+        }
+
         if(mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
+            mGoogleApiClient = null;
         }
     }
 
