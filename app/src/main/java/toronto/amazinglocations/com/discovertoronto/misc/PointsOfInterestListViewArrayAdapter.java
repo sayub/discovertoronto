@@ -7,10 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.RoundImage;
-import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
 
 public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfInterest> {
     private Context mContext;

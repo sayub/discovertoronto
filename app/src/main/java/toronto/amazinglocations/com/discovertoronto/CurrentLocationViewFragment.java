@@ -45,6 +45,7 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         super.onResume();
         Log.i(CLASS, "onResume()");
 
+        // Getting the child map Fragment and getting it ready by calling getMapAsync().
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.currentLocationMap);
         if (mSupportMapFragment != null) {
             mSupportMapFragment.getMapAsync(this);
@@ -52,24 +53,13 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
     }
 
     public void onPause() {
+        // Stopping the Location services.
         terminateGoogleApiClient();
+        // Removing this Fragment.
         getFragmentManager().beginTransaction().remove(this).commit();
 
         Log.i(CLASS, "onPause()");
         super.onPause();
-    }
-
-    public void setUserVisibleHint(boolean isVisible) {
-        if (getView() == null) {
-            return;
-        }
-
-        if (isVisible) {
-
-        }
-        else {
-
-        }
     }
 
     @Override
@@ -77,8 +67,10 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         Log.i(CLASS, "onMapReady()");
 
         mMap = googleMap;
+        // Disabling map scrolling.
         mMap.getUiSettings().setScrollGesturesEnabled(false);
 
+        // Starts Google Location services.
         buildGoogleApiClient();
     }
 
@@ -94,6 +86,7 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         // Creates a boundary in terms of latitudes and longitudes.
         mBuilder = new LatLngBounds.Builder();
 
+        // Adding this user's current Location Marker to the map.
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
@@ -111,8 +104,8 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         // offset from edges of the map in pixels.
         int padding = 80;
 
+        // Centering the boundary within the screen.
         final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
         mMap.moveCamera(cu);
     }
 

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private static int currentlySelectedTabPosition = 0;
     private ArrayList<ImageView> mTabSelectors;
     private ArrayList<View> mTabIndicators;
     private ViewPager mPager;
@@ -29,8 +30,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         pageFragmentClassNames.add(BixiBikeLocationsViewFragment.class.getName());
         pageFragmentClassNames.add(CurrentLocationViewFragment.class.getName());
 
+        // Getting a reference to the ViewPager and setting its Adapter.
         mPager = (ViewPager)findViewById(R.id.pager);
         mPager.setAdapter(new MainPagerAdapter(getSupportFragmentManager(), pageFragmentClassNames));
+        // Registering listener for ViewPager swipe event.
         mPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -38,8 +41,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        // ArrayList holding the page tabs at the top.
         mTabSelectors = new ArrayList<ImageView>();
-
+        // Getting references to the page tabs and registering listeners for press event.
         ImageView pointsOfInterestTabImageView = (ImageView)findViewById(R.id.pointsOfInterestTabImageView);
         pointsOfInterestTabImageView.setOnClickListener(this);
 
@@ -49,21 +53,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ImageView navigationTabImageView = (ImageView)findViewById(R.id.navigationTabImageView);
         navigationTabImageView.setOnClickListener(this);
 
+        // Adding page tabs to ArrayList.
         mTabSelectors.add(pointsOfInterestTabImageView);
         mTabSelectors.add(bixiBikeLocationsTabImageView);
         mTabSelectors.add(navigationTabImageView);
 
+        // ArrayList holding the page tab indicators. These indicators let the user know the position of the currently
+        // selected tab through special coloring.
         mTabIndicators = new ArrayList<View>();
 
+        // Getting references to the indicators.
         View pointsOfInterestTabIndicator = (View)findViewById(R.id.pointsOfInterestTabIndicator);
         View bixiBikeLocationsTabIndicator = (View)findViewById(R.id.bixiBikeLocationsTabIndicator);
         View navigationTabIndicator = (View)findViewById(R.id.navigationTabIndicator);
 
+        // Adding the indicators to ArrayList.
         mTabIndicators.add(pointsOfInterestTabIndicator);
         mTabIndicators.add(bixiBikeLocationsTabIndicator);
         mTabIndicators.add(navigationTabIndicator);
 
-        setSelectedIndicator(0);
+        // Setting the currently selected tab. 'currentlySelectedTabPosition' remembers the current tab position even after a
+        // screen orientation change.
+        mPager.setCurrentItem(currentlySelectedTabPosition);
+        setSelectedIndicator(currentlySelectedTabPosition);
     }
 
     private class MainPagerAdapter extends FragmentPagerAdapter {
@@ -85,15 +97,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onClick(View view) {
         int id = view.getId();
-
+        // Looping through the ArrayList, and after getting the index of the clicked tab, changing the displayed Fragment.
         for(int i = 0; i < mTabSelectors.size(); i++) {
             if (id == mTabSelectors.get(i).getId()) {
                 mPager.setCurrentItem(i);
+                break;
             }
         }
     }
 
     private void setSelectedIndicator(int position) {
+        currentlySelectedTabPosition = position;
+        // Looping through the ArrayList, and setting the color of the selected tab indicator to blue.
         for (int i = 0; i <  mTabIndicators.size(); i++) {
             if (position == i) {
                 mTabIndicators.get(i).setBackgroundResource(R.color.colorPrimary);

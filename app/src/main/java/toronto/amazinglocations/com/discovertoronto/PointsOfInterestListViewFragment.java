@@ -11,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
 import toronto.amazinglocations.com.discovertoronto.misc.PointsOfInterestListViewArrayAdapter;
 
@@ -46,27 +48,32 @@ public class PointsOfInterestListViewFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_points_of_interest_list_view,
                 container, false);
 
-        final PointOfInterest items[] = new PointOfInterest[mPointsOfInterestImages.length];
+        final ArrayList<PointOfInterest> items = new ArrayList<PointOfInterest>();
 
-        for (int i = 0; i < items.length; i++) {
+        for (int i = 0; i < mPointsOfInterestImages.length; i++) {
             Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), mPointsOfInterestImages[i], 60, 60);
             //bitmap = bitmap.createScaledBitmap(bitmap, 100, 100, true);
-            items[i] = new PointOfInterest(bitmap, mPointsOfInterestNames[i], mLats[i], mLngs[i], mURLs[i]);
+            items.add(new PointOfInterest(bitmap, mPointsOfInterestNames[i], mLats[i], mLngs[i], mURLs[i]));
         }
 
-        PointsOfInterestListViewArrayAdapter adapter = new PointsOfInterestListViewArrayAdapter(getActivity(), R.layout.listview_row, items);
-
+        PointOfInterest [] itemsToArray = new PointOfInterest[items.size()];
+        // Sorting the ArrayList 'items'.
+        Collections.sort(items, new PointsOfInterestComparator());
+        // Creating the adapter for the ListView.
+        PointsOfInterestListViewArrayAdapter adapter = new PointsOfInterestListViewArrayAdapter(getActivity(), R.layout.listview_row, items.toArray(itemsToArray));
+        // Getting reference to the ListView.
         ListView listView = (ListView)view.findViewById(R.id.pointsOfInterestListView);
+        // Setting the ListView Adapter.
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
 
                 Bundle bundle = new Bundle();
-                bundle.putString("name", items[position].getName());
-                bundle.putDouble("lat", items[position].getLatitude());
-                bundle.putDouble("lng", items[position].getLongitude());
-                bundle.putString("url", items[position].getURL());
+                bundle.putString("name", items.get(position).getName());
+                bundle.putDouble("lat", items.get(position).getLatitude());
+                bundle.putDouble("lng", items.get(position).getLongitude());
+                bundle.putString("url", items.get(position).getURL());
                 webViewIntent.putExtras(bundle);
 
                 getActivity().startActivity(webViewIntent);
@@ -113,5 +120,13 @@ public class PointsOfInterestListViewFragment extends Fragment {
         }
 
         return inSampleSize;
+    }
+
+    class PointsOfInterestComparator implements Comparator<PointOfInterest> {
+        @Override
+        public int compare(PointOfInterest c1, PointOfInterest c2) {
+            return c1.getName().compareTo(c2.getName());
+        }
+
     }
 }

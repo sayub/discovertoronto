@@ -26,19 +26,25 @@ public class BikesLocationReaderAsyncTask extends AsyncTask<String, Void, String
         String JSONInput = "";
 
         try {
+            // The url to fetch JSON data from.
             URL url = new URL(urls[0]);
+            // Connecting with the url.
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setDoInput(true);
             connection.connect();
 
+            // Getting the InputStream from the connection.
             inputStream = connection.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
+            // Reading lines until null is returned.
             while((line = bufferedReader.readLine()) != null) {
+                // Appending the lines to JSONInput.
                 JSONInput += line;
             }
 
+            // Returning JSONInput.
             return JSONInput;
         }
         catch(MalformedURLException ex) {
@@ -55,6 +61,7 @@ public class BikesLocationReaderAsyncTask extends AsyncTask<String, Void, String
     }
 
     protected void onPostExecute(String result) {
+        // Sending the downloaded data to the Handler object.
         if(result != null) {
             Bundle msgBundle = new Bundle();
             msgBundle.putString("bikesLocationDetails", result);
