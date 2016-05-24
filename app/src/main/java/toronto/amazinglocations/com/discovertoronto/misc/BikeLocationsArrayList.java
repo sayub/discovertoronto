@@ -1,3 +1,8 @@
+/*
+* @author  Saad Muhammad Ayub
+* Copyright 2016, Saad Muhammad Ayub, All rights reserved.
+*/
+
 package toronto.amazinglocations.com.discovertoronto.misc;
 
 import android.location.Location;
