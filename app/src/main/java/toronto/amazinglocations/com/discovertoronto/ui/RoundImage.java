@@ -1,4 +1,4 @@
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.app.Activity;
 import android.content.Context;

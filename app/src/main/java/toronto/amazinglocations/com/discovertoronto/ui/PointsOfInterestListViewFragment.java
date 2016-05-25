@@ -3,7 +3,7 @@
 * Copyright 2016, Saad Muhammad Ayub, All rights reserved.
 */
 
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -19,6 +19,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
 import toronto.amazinglocations.com.discovertoronto.misc.PointsOfInterestListViewArrayAdapter;
 

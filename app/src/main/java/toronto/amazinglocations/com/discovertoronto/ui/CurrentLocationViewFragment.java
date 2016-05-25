@@ -3,15 +3,16 @@
 * Copyright 2016, Saad Muhammad Ayub, All rights reserved.
 */
 
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.ui;
 
-import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.provider.Settings;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -27,86 +28,71 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import toronto.amazinglocations.com.discovertoronto.misc.LocationEnabledChecker;
+import toronto.amazinglocations.com.discovertoronto.R;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
-    private static final int ENABLE_LOCATION_REQUEST = 1;  // The request code.
-    private boolean wasLocationSettingsActivityVisible = false;
+public class CurrentLocationViewFragment extends Fragment implements OnMapReadyCallback {
+    private static final String CLASS = CurrentLocationViewFragment.class.getSimpleName();
+    private SupportMapFragment mSupportMapFragment;
     private GoogleMap mMap;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private LatLngBounds.Builder mBuilder;
-    private GoogleApiClient mGoogleApiClient = null;
-    private LocationRequest mLocationRequest;
-    private String mName;
-    private double mLat;
-    private double mLng;
     private int mLocationUpdateInterval = 5000;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.i(CLASS, "onCreateView()");
+        View v = inflater.inflate(R.layout.fragment_current_location_view, container, false);
+
+        return v;
     }
 
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
+        Log.i(CLASS, "onResume()");
 
-        boolean isLocationEnabled = LocationEnabledChecker.isLocationEnabled(this);
-        // If Google location is not enabled, need to show the Activity from which user can enable it.
-        if (!isLocationEnabled && !wasLocationSettingsActivityVisible) {
-            Toast.makeText(this, getResources().getString(R.string.gps_network_not_enabled), Toast.LENGTH_LONG).show();
-            Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivityForResult(locationSettingsIntent, ENABLE_LOCATION_REQUEST);
-            return;
-        }
-        // Otherwise if location is enabled, continue.
-        else if (isLocationEnabled) {
-            wasLocationSettingsActivityVisible = false;
-            enableActivity();
-        }
-        else {
-            finish();
+        // Getting the child map Fragment and getting it ready by calling getMapAsync().
+        mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.currentLocationMap);
+        if (mSupportMapFragment != null) {
+            mSupportMapFragment.getMapAsync(this);
         }
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // If location settings Activity was visible, the boolean flag would be true.
-        if (requestCode == ENABLE_LOCATION_REQUEST) {
-            wasLocationSettingsActivityVisible = true;
-        }
-    }
-
-    protected void enableActivity() {
-        Bundle bundle = getIntent().getExtras();
-        mName = bundle.getString("name");
-        mLat = bundle.getDouble("lat");
-        mLng = bundle.getDouble("lng");
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-    }
-
-    protected void onPause() {
-        super.onPause();
-
+    public void onPause() {
+        // Stopping the Location services.
         terminateGoogleApiClient();
+        // Removing this Fragment.
+        getFragmentManager().beginTransaction().remove(this).commit();
+
+        Log.i(CLASS, "onPause()");
+        super.onPause();
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        Log.i(CLASS, "onMapReady()");
 
+        mMap = googleMap;
+        // Disabling map scrolling.
+        mMap.getUiSettings().setScrollGesturesEnabled(false);
+
+        // Starts Google Location services.
         buildGoogleApiClient();
     }
 
     public void updateMap(Location currentUserLocation) {
+        Log.i(CLASS, "updateMap()");
+
+        if(getActivity() == null) {
+            return;
+        }
+
         mMap.clear();
 
         // Creates a boundary in terms of latitudes and longitudes.
         mBuilder = new LatLngBounds.Builder();
 
+        // Adding this user's current Location Marker to the map.
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
@@ -117,13 +103,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Adding self to mBuilder.
             mBuilder.include(self.getPosition());
         }
-
-        Marker pointOfInterest =  mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(mLat, mLng))
-                .icon(BitmapDescriptorFactory.defaultMarker())
-                .title(mName));
-        // Adding the position of the point of interest to mBuilder.
-        mBuilder.include(pointOfInterest.getPosition());
 
         // Creates the boundary object.
         LatLngBounds bounds = mBuilder.build();
@@ -137,7 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void buildGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext())
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(locationServicesCallbacks)
                 .addOnConnectionFailedListener(connectionFailedListener)
                 .addApi(LocationServices.API)
@@ -151,7 +130,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
 
-        if (mGoogleApiClient.isConnected()) {
+        if(mGoogleApiClient.isConnected()) {
             stopLocationUpdates();
             mGoogleApiClient.disconnect();
             mGoogleApiClient = null;

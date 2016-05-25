@@ -3,16 +3,19 @@
 * Copyright 2016, Saad Muhammad Ayub, All rights reserved.
 */
 
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -28,20 +31,41 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import toronto.amazinglocations.com.discovertoronto.R;
+import toronto.amazinglocations.com.discovertoronto.misc.BikeLocationsArrayList;
+import toronto.amazinglocations.com.discovertoronto.misc.BikesLocationReaderAsyncTask;
 
-public class CurrentLocationViewFragment extends Fragment implements OnMapReadyCallback {
-    private static final String CLASS = CurrentLocationViewFragment.class.getSimpleName();
+public class BixiBikeLocationsViewFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
+    private static final String CLASS = BixiBikeLocationsViewFragment.class.getSimpleName();
+    private static BikeLocationsArrayList sBikeStandLocationLatLngPairs = null;
     private SupportMapFragment mSupportMapFragment;
     private GoogleMap mMap;
+    private LatLngBounds.Builder mBuilder;
+    private Location mLastLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private Location mLastLocation;
-    private LatLngBounds.Builder mBuilder;
     private int mLocationUpdateInterval = 5000;
+    private int mNumOfBikeStands = 1;
+    private boolean mBixiLocationsShown = true;
+    private ImageView mShowMoreBikeStandLocationsImageView;
+    private ImageView mShowLessBikeStandLocationsImageView;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(CLASS, "onCreateView()");
-        View v = inflater.inflate(R.layout.fragment_current_location_view, container, false);
+
+        View v = inflater.inflate(R.layout.fragment_bixi_bike_locations_view, container, false);
+
+        // Pressing on 'mShowMoreBikeStandLocationsImageView' shows more bike locations.
+        mShowMoreBikeStandLocationsImageView = (ImageView)v.findViewById(R.id.showMoreBikeStandLocationsImageView);
+        mShowMoreBikeStandLocationsImageView.setOnClickListener(this);
+
+        // // Pressing on 'mShowLessBikeStandLocationsImageView' shows less bike locations.
+        mShowLessBikeStandLocationsImageView = (ImageView)v.findViewById(R.id.showLessBikeStandLocationsImageView);
+        mShowLessBikeStandLocationsImageView.setOnClickListener(this);
 
         return v;
     }
@@ -51,7 +75,7 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         Log.i(CLASS, "onResume()");
 
         // Getting the child map Fragment and getting it ready by calling getMapAsync().
-        mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.currentLocationMap);
+        mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.bixiMap);
         if (mSupportMapFragment != null) {
             mSupportMapFragment.getMapAsync(this);
         }
@@ -74,6 +98,11 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         mMap = googleMap;
         // Disabling map scrolling.
         mMap.getUiSettings().setScrollGesturesEnabled(false);
+        // Using AsyncTask to fetch bixi bike locations. The information returned is stored in the static
+        // 'sBikeStandLocationLatLngPairs'
+        if (sBikeStandLocationLatLngPairs == null) {
+            new BikesLocationReaderAsyncTask(postReadBikesLocationHandler).execute("http://www.bikesharetoronto.com/stations/json");
+        }
 
         // Starts Google Location services.
         buildGoogleApiClient();
@@ -101,6 +130,26 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
             self.showInfoWindow();
             // Adding self to mBuilder.
             mBuilder.include(self.getPosition());
+        }
+
+        // Needed for boundary object within which all Markers will appear.
+        if (mBixiLocationsShown && sBikeStandLocationLatLngPairs != null) {
+            // If user clicks on the '+' button too many times, 'mNumOfBikeStands' might be bigger than 'sBikeStandLocationLatLngPairs'.
+            // The value of 'mNumOfBikeStands' should not be bigger than 'sBikeStandLocationLatLngPairs'.
+            if (mNumOfBikeStands > sBikeStandLocationLatLngPairs.size()) {
+                mNumOfBikeStands = sBikeStandLocationLatLngPairs.size();
+            }
+            // Getting the closest 'mNumOfBikeStands' many bike stands starting with the closest one.
+            ArrayList<LatLng> nClosestLatLngPairs = sBikeStandLocationLatLngPairs.getNClosestLatLngPairs(currentUserLocation, mNumOfBikeStands);
+
+            for (int i = 0; i < nClosestLatLngPairs.size(); i++) {
+                // Creating Marker from LatLng object at index i of the ArrayList 'mBikeLocationLatLngPairs'.
+                Marker bikeStandMarker = mMap.addMarker(new MarkerOptions()
+                        .position(nClosestLatLngPairs.get(i))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+
+                mBuilder.include(bikeStandMarker.getPosition());
+            }
         }
 
         // Creates the boundary object.
@@ -180,4 +229,49 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
             updateMap(mLastLocation);
         }
     };
+
+    private final Handler postReadBikesLocationHandler = new Handler() {
+        public void handleMessage(Message message) {
+            sBikeStandLocationLatLngPairs = new BikeLocationsArrayList();
+
+            try {
+                // Creating the root level JSON object from the String returned by the AsyncTask.
+                JSONObject bikesLocationDetails = new JSONObject(message.getData().getString("bikesLocationDetails"));
+                // Retrieving the 'stationBeanList' JSONArray that contains the details of the bike-stands.
+                JSONArray stationBeanList = bikesLocationDetails.optJSONArray("stationBeanList");
+                // Making pass through the JSONArray to retrieve the details of each bike stand.
+                for(int i = 0; i < stationBeanList.length(); i++) {
+                    // Retrieving the bike-stand details at index i.
+                    JSONObject stationBeanElement = stationBeanList.getJSONObject(i);
+                    // Retrieving the latitude and longitude of the bike-stand at index i.
+                    double latitude = Double.parseDouble(stationBeanElement.optString("latitude"));
+                    double longitude = Double.parseDouble(stationBeanElement.optString("longitude"));
+                    // Creating a LatLng object from the latitude and longitude and adding it to the
+                    // ArrayList 'mBikeLocationLatLngPairs'.
+                    sBikeStandLocationLatLngPairs.add(new LatLng(latitude, longitude));
+                }
+
+                updateMap(mLastLocation);
+            }
+            catch(JSONException ex) {
+
+            }
+        }
+    };
+
+    public void onClick(View view) {
+        int id = view.getId();
+        // If user clicked on the '+' button.
+        if (id == mShowMoreBikeStandLocationsImageView.getId()) {
+            mNumOfBikeStands++;
+        }
+        // If user clicked on the '-' button.
+        else if (id == mShowLessBikeStandLocationsImageView.getId()) {
+            if (mNumOfBikeStands > 1) {
+                mNumOfBikeStands--;
+            }
+        }
+        // Update the map to show the new number of bike stands.
+        updateMap(mLastLocation);
+    }
 }

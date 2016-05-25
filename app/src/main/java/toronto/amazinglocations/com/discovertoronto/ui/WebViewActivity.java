@@ -3,7 +3,7 @@
 * Copyright 2016, Saad Muhammad Ayub, All rights reserved.
 */
 
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import toronto.amazinglocations.com.discovertoronto.R;
 
 public class WebViewActivity extends AppCompatActivity implements View.OnClickListener {
 

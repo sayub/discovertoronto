@@ -3,7 +3,7 @@
 * Copyright 2016, Saad Muhammad Ayub, All rights reserved.
 */
 
-package toronto.amazinglocations.com.discovertoronto;
+package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 import java.util.ArrayList;
+import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.misc.LocationEnabledChecker;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
