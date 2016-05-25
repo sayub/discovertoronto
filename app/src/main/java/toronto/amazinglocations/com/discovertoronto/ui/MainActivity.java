@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<ImageView> mTabSelectors;
     private ArrayList<View> mTabIndicators;
     private ViewPager mPager;
+    private ShimmerView mRightShimmerView;
 
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void enableActivity() {
+        mRightShimmerView = (ShimmerView)findViewById(R.id.rightShimmerView);
+        mRightShimmerView.startAnimation();
+
         // Setting up the Fragment class names to be used for the different pages by the ViewPager.
         ArrayList<String> pageFragmentClassNames = new ArrayList<String>();
         pageFragmentClassNames.add(PointsOfInterestListViewFragment.class.getName());
@@ -114,6 +118,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // screen orientation change.
         mPager.setCurrentItem(currentlySelectedTabPosition);
         setSelectedIndicator(currentlySelectedTabPosition);
+    }
+
+    protected void onPause(){
+        if(mRightShimmerView != null) {
+            mRightShimmerView.stopAnimation();
+        }
+
+        super.onPause();
     }
 
     public void onClick(View view) {
