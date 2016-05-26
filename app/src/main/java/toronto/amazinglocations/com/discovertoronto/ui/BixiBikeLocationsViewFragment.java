@@ -42,6 +42,8 @@ import toronto.amazinglocations.com.discovertoronto.misc.BikesLocationReaderAsyn
 public class BixiBikeLocationsViewFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
     private static final String CLASS = BixiBikeLocationsViewFragment.class.getSimpleName();
     private static BikeLocationsArrayList sBikeStandLocationLatLngPairs = null;
+    private static int sNumOfBikeStands = 1;
+    private static ArrayList<LatLng> sClosestLatLngPairs = null;
     private SupportMapFragment mSupportMapFragment;
     private GoogleMap mMap;
     private LatLngBounds.Builder mBuilder;
@@ -49,7 +51,6 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private int mLocationUpdateInterval = 5000;
-    private int mNumOfBikeStands = 1;
     private boolean mBixiLocationsShown = true;
     private ImageView mShowMoreBikeStandLocationsImageView;
     private ImageView mShowLessBikeStandLocationsImageView;
@@ -136,16 +137,18 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         if (mBixiLocationsShown && sBikeStandLocationLatLngPairs != null) {
             // If user clicks on the '+' button too many times, 'mNumOfBikeStands' might be bigger than 'sBikeStandLocationLatLngPairs'.
             // The value of 'mNumOfBikeStands' should not be bigger than 'sBikeStandLocationLatLngPairs'.
-            if (mNumOfBikeStands > sBikeStandLocationLatLngPairs.size()) {
-                mNumOfBikeStands = sBikeStandLocationLatLngPairs.size();
+            if (sNumOfBikeStands > sBikeStandLocationLatLngPairs.size()) {
+                sNumOfBikeStands = sBikeStandLocationLatLngPairs.size();
             }
-            // Getting the closest 'mNumOfBikeStands' many bike stands starting with the closest one.
-            ArrayList<LatLng> nClosestLatLngPairs = sBikeStandLocationLatLngPairs.getNClosestLatLngPairs(currentUserLocation, mNumOfBikeStands);
+            // If 'sClosestLatLngPairs' is null, getting the closest 'sNumOfBikeStands' many bike stands starting with the closest one.
+            if (sClosestLatLngPairs == null) {
+                sClosestLatLngPairs = sBikeStandLocationLatLngPairs.getNClosestLatLngPairs(currentUserLocation, sNumOfBikeStands);
+            }
 
-            for (int i = 0; i < nClosestLatLngPairs.size(); i++) {
+            for (int i = 0; i < sClosestLatLngPairs.size(); i++) {
                 // Creating Marker from LatLng object at index i of the ArrayList 'mBikeLocationLatLngPairs'.
                 Marker bikeStandMarker = mMap.addMarker(new MarkerOptions()
-                        .position(nClosestLatLngPairs.get(i))
+                        .position(sClosestLatLngPairs.get(i))
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
                 mBuilder.include(bikeStandMarker.getPosition());
@@ -263,14 +266,16 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         int id = view.getId();
         // If user clicked on the '+' button.
         if (id == mShowMoreBikeStandLocationsImageView.getId()) {
-            mNumOfBikeStands++;
+            sNumOfBikeStands++;
         }
         // If user clicked on the '-' button.
         else if (id == mShowLessBikeStandLocationsImageView.getId()) {
-            if (mNumOfBikeStands > 1) {
-                mNumOfBikeStands--;
+            if (sNumOfBikeStands > 1) {
+                sNumOfBikeStands--;
             }
         }
+
+        sClosestLatLngPairs = null;
         // Update the map to show the new number of bike stands.
         updateMap(mLastLocation);
     }
