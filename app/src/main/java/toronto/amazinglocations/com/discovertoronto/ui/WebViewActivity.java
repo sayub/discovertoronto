@@ -15,6 +15,7 @@ import android.widget.Button;
 import toronto.amazinglocations.com.discovertoronto.R;
 
 public class WebViewActivity extends AppCompatActivity implements View.OnClickListener {
+    private ShimmerView mRightShimmerView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,6 +25,9 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
     protected void onResume() {
         super.onResume();
 
+        mRightShimmerView = (ShimmerView)findViewById(R.id.rightShimmerView);
+        mRightShimmerView.startAnimation();
+
         String url = getIntent().getExtras().getString("url");
 
         WebView pointOfInterestWebView = (WebView)findViewById(R.id.pointOfInterestWebView);
@@ -32,6 +36,14 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
 
         Button mapButton = (Button)findViewById(R.id.mapButton);
         mapButton.setOnClickListener(this);
+    }
+
+    protected void onPause() {
+        super.onPause();
+
+        if(mRightShimmerView != null) {
+            mRightShimmerView.stopAnimation();
+        }
     }
 
     public void onClick(View v) {

@@ -8,6 +8,11 @@
         android:layout_height="0dp"
         android:layout_weight="9"
     />
+    <toronto.amazinglocations.com.discovertoronto.ui.ShimmerView
+        android:id="@+id/rightShimmerView"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+    />
     <Button
         android:id="@+id/mapButton"
         android:layout_width="match_parent"

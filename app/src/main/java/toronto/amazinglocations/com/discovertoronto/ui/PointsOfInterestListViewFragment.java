@@ -24,6 +24,8 @@ import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
 import toronto.amazinglocations.com.discovertoronto.misc.PointsOfInterestListViewArrayAdapter;
 
 public class PointsOfInterestListViewFragment extends Fragment {
+    private static PointOfInterest[] sItemsToArray = null;
+
     private int[] mPointsOfInterestImages = {
             R.drawable.aquarium, R.drawable.artgalleryontario, R.drawable.cntower,
             R.drawable.rom, R.drawable.torontocityhall, R.drawable.torontoeatoncentre,
@@ -51,22 +53,33 @@ public class PointsOfInterestListViewFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_points_of_interest_list_view,
-                container, false);
+        View view =  inflater.inflate(R.layout.fragment_points_of_interest_list_view, container, false);
 
-        final ArrayList<PointOfInterest> items = new ArrayList<PointOfInterest>();
+        // Once sPointsOfInterestItems' is populated and the values are sorted based on names, it should remain in memory until
+        // the app is killed.
+        if (sItemsToArray == null) {
+            ArrayList<PointOfInterest> pointsOfInterestItems = new ArrayList<PointOfInterest>();
 
-        for (int i = 0; i < mPointsOfInterestImages.length; i++) {
-            Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), mPointsOfInterestImages[i], 60, 60);
-            //bitmap = bitmap.createScaledBitmap(bitmap, 100, 100, true);
-            items.add(new PointOfInterest(bitmap, mPointsOfInterestNames[i], mLats[i], mLngs[i], mURLs[i]));
+            for (int i = 0; i < mPointsOfInterestImages.length; i++) {
+                Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), mPointsOfInterestImages[i], 60, 60);
+                //bitmap = bitmap.createScaledBitmap(bitmap, 100, 100, true);
+                pointsOfInterestItems.add(new PointOfInterest(bitmap, mPointsOfInterestNames[i], mLats[i], mLngs[i], mURLs[i]));
+            }
+            // Sorting the ArrayList 'items'.
+            Collections.sort(pointsOfInterestItems, new PointsOfInterestComparator());
+
+            // Also stays in memory for performance reasons until app is killed.
+            sItemsToArray = new PointOfInterest[pointsOfInterestItems.size()];
+
+            for (int i = 0; i < pointsOfInterestItems.size(); i++) {
+                sItemsToArray[i] = pointsOfInterestItems.get(i);
+            }
+
+            pointsOfInterestItems = null;
         }
 
-        PointOfInterest [] itemsToArray = new PointOfInterest[items.size()];
-        // Sorting the ArrayList 'items'.
-        Collections.sort(items, new PointsOfInterestComparator());
         // Creating the adapter for the ListView.
-        PointsOfInterestListViewArrayAdapter adapter = new PointsOfInterestListViewArrayAdapter(getActivity(), R.layout.listview_row, items.toArray(itemsToArray));
+        PointsOfInterestListViewArrayAdapter adapter = new PointsOfInterestListViewArrayAdapter(getActivity(), R.layout.listview_row, sItemsToArray);
         // Getting reference to the ListView.
         ListView listView = (ListView)view.findViewById(R.id.pointsOfInterestListView);
         // Setting the ListView Adapter.
@@ -76,10 +89,10 @@ public class PointsOfInterestListViewFragment extends Fragment {
                 Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
 
                 Bundle bundle = new Bundle();
-                bundle.putString("name", items.get(position).getName());
-                bundle.putDouble("lat", items.get(position).getLatitude());
-                bundle.putDouble("lng", items.get(position).getLongitude());
-                bundle.putString("url", items.get(position).getURL());
+                bundle.putString("name", sItemsToArray[position].getName());
+                bundle.putDouble("lat", sItemsToArray[position].getLatitude());
+                bundle.putDouble("lng", sItemsToArray[position].getLongitude());
+                bundle.putString("url", sItemsToArray[position].getURL());
                 webViewIntent.putExtras(bundle);
 
                 getActivity().startActivity(webViewIntent);
@@ -133,6 +146,5 @@ public class PointsOfInterestListViewFragment extends Fragment {
         public int compare(PointOfInterest c1, PointOfInterest c2) {
             return c1.getName().compareTo(c2.getName());
         }
-
     }
 }

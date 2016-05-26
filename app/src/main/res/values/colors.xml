@@ -10,4 +10,5 @@
     <color name="colorDarkTransluscent">#66000000</color>
     <color name="colorLightTransluscent">#22000000</color>
     <color name="colorTransluscent">#00000000</color>
+    <color name="colorAzure">#F0FFFF</color>
 </resources>
