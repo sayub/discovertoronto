@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,21 +77,30 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         super.onResume();
         Log.i(CLASS, "onResume()");
 
+        FragmentManager fm = getChildFragmentManager();
         // Getting the child map Fragment and getting it ready by calling getMapAsync().
-        mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.bixiMap);
-        if (mSupportMapFragment != null) {
-            mSupportMapFragment.getMapAsync(this);
+        mSupportMapFragment = (SupportMapFragment) fm.findFragmentByTag("bixiMapFragment");
+        //
+        if (mSupportMapFragment == null) {
+            mSupportMapFragment = new SupportMapFragment();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.add(R.id.bixiMapHolderLayout, mSupportMapFragment, "bixiMapFragment");
+            ft.commit();
+            fm.executePendingTransactions();
         }
+        mSupportMapFragment.getMapAsync(this);
     }
 
     public void onPause() {
+        Log.i(CLASS, "onPause()");
         // Stopping the Location services.
         terminateGoogleApiClient();
-        // Removing this Fragment.
-        getFragmentManager().beginTransaction().remove(this).commit();
-
-        Log.i(CLASS, "onPause()");
         super.onPause();
+    }
+
+    public void onDestroyView() {
+        Log.i("LOG", "onDestroyView");
+        super.onDestroyView();
     }
 
     @Override

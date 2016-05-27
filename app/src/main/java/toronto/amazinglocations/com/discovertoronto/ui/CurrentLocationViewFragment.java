@@ -9,6 +9,8 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,20 +53,24 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         super.onResume();
         Log.i(CLASS, "onResume()");
 
-        // Getting the child map Fragment and getting it ready by calling getMapAsync().
-        mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.currentLocationMap);
-        if (mSupportMapFragment != null) {
-            mSupportMapFragment.getMapAsync(this);
+        FragmentManager fm = getChildFragmentManager();
+
+        // Getting the child map Fragment by tag.
+        mSupportMapFragment = (SupportMapFragment)fm.findFragmentByTag("mapFragment");
+        if (mSupportMapFragment == null) {
+            mSupportMapFragment = new SupportMapFragment();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.add(R.id.mapHolderLayout, mSupportMapFragment, "mapFragment");
+            ft.commit();
+            fm.executePendingTransactions();
         }
+        mSupportMapFragment.getMapAsync(this);
     }
 
     public void onPause() {
+        Log.i(CLASS, "onPause()");
         // Stopping the Location services.
         terminateGoogleApiClient();
-        // Removing this Fragment.
-        getFragmentManager().beginTransaction().remove(this).commit();
-
-        Log.i(CLASS, "onPause()");
         super.onPause();
     }
 

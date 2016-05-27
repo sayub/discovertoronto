@@ -22,7 +22,7 @@ import toronto.amazinglocations.com.discovertoronto.misc.LocationEnabledChecker;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int ENABLE_LOCATION_REQUEST = 1;  // The request code.
-    private static int currentlySelectedTabPosition = 0;
+    private static int sCurrentlySelectedTabPosition = 0;
     private boolean wasLocationSettingsActivityVisible = false;
     private ArrayList<ImageView> mTabSelectors;
     private ArrayList<View> mTabIndicators;
@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Setting the currently selected tab. 'currentlySelectedTabPosition' remembers the current tab position even after a
         // screen orientation change.
-        mPager.setCurrentItem(currentlySelectedTabPosition);
-        setSelectedIndicator(currentlySelectedTabPosition);
+        mPager.setCurrentItem(sCurrentlySelectedTabPosition);
+        setSelectedIndicator(sCurrentlySelectedTabPosition);
     }
 
     protected void onPause(){
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setSelectedIndicator(int position) {
-        currentlySelectedTabPosition = position;
+        sCurrentlySelectedTabPosition = position;
         // Looping through the ArrayList, and setting the color of the selected tab indicator to blue.
         for (int i = 0; i <  mTabIndicators.size(); i++) {
             if (position == i) {
