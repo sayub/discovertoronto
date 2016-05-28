@@ -5,25 +5,23 @@
 
 package toronto.amazinglocations.com.discovertoronto.misc;
 
-import android.graphics.Bitmap;
-
 public class PointOfInterest {
-    private Bitmap mImage;
+    private int mImageResourceId;
     private String mName;
     private double mLatitude;
     private double mLongitude;
     private String mURL;
 
-    public PointOfInterest(Bitmap image, String name, double latitude, double longitude, String url) {
-        mImage = image;
+    public PointOfInterest(int imageResourceId, String name, double latitude, double longitude, String url) {
+        mImageResourceId = imageResourceId;
         mName = name;
         mLatitude = latitude;
         mLongitude = longitude;
         mURL = url;
     }
 
-    public Bitmap getImage() {
-        return mImage;
+    public int getImageResourceId() {
+        return  mImageResourceId;
     }
 
     public String getName() {

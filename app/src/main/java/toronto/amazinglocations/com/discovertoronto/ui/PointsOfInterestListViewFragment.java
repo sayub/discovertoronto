@@ -24,9 +24,10 @@ import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
 import toronto.amazinglocations.com.discovertoronto.misc.PointsOfInterestListViewArrayAdapter;
 
 public class PointsOfInterestListViewFragment extends Fragment {
-    private static PointOfInterest[] sItemsToArray = null;
+    private static PointOfInterest sItemsToArray[] = null;
+    private PointsOfInterestListViewArrayAdapter mAdapter;
 
-    private int[] mPointsOfInterestImages = {
+    private int[] mPointsOfInterestImageResourceIds = {
             R.drawable.aquarium, R.drawable.artgalleryontario, R.drawable.cntower,
             R.drawable.rom, R.drawable.torontocityhall, R.drawable.torontoeatoncentre,
             R.drawable.torontozoo, R.drawable.yorkdalemall, R.drawable.hockey_hall_of_fame,
@@ -55,15 +56,14 @@ public class PointsOfInterestListViewFragment extends Fragment {
         // Inflate the layout for this fragment
         View view =  inflater.inflate(R.layout.fragment_points_of_interest_list_view, container, false);
 
-        // Once sPointsOfInterestItems' is populated and the values are sorted based on names, it should remain in memory until
+        // Once pointsOfInterestItems' is populated and the values are sorted based on names, it should remain in memory until
         // the app is killed.
         if (sItemsToArray == null) {
             ArrayList<PointOfInterest> pointsOfInterestItems = new ArrayList<PointOfInterest>();
 
-            for (int i = 0; i < mPointsOfInterestImages.length; i++) {
-                Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), mPointsOfInterestImages[i], 60, 60);
-                //bitmap = bitmap.createScaledBitmap(bitmap, 100, 100, true);
-                pointsOfInterestItems.add(new PointOfInterest(bitmap, mPointsOfInterestNames[i], mLats[i], mLngs[i], mURLs[i]));
+            for (int i = 0; i < mPointsOfInterestImageResourceIds.length; i++) {
+                //Bitmap bitmap = decodeSampledBitmapFromResource(getResources(), mPointsOfInterestImages[i], 60, 60);
+                pointsOfInterestItems.add(new PointOfInterest(mPointsOfInterestImageResourceIds[i], mPointsOfInterestNames[i], mLats[i], mLngs[i], mURLs[i]));
             }
             // Sorting the ArrayList 'items'.
             Collections.sort(pointsOfInterestItems, new PointsOfInterestComparator());
@@ -77,13 +77,12 @@ public class PointsOfInterestListViewFragment extends Fragment {
 
             pointsOfInterestItems = null;
         }
-
         // Creating the adapter for the ListView.
-        PointsOfInterestListViewArrayAdapter adapter = new PointsOfInterestListViewArrayAdapter(getActivity(), R.layout.listview_row, sItemsToArray);
+        mAdapter = new PointsOfInterestListViewArrayAdapter(getActivity(), R.layout.listview_row, sItemsToArray);
         // Getting reference to the ListView.
         ListView listView = (ListView)view.findViewById(R.id.pointsOfInterestListView);
         // Setting the ListView Adapter.
-        listView.setAdapter(adapter);
+        listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent webViewIntent = new Intent(getActivity(), WebViewActivity.class);
@@ -100,6 +99,10 @@ public class PointsOfInterestListViewFragment extends Fragment {
         });
 
         return view;
+    }
+
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
