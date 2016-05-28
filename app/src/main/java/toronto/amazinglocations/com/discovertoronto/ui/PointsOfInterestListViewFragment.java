@@ -6,9 +6,6 @@
 package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -30,26 +27,29 @@ public class PointsOfInterestListViewFragment extends Fragment {
     private int[] mPointsOfInterestImageResourceIds = {
             R.drawable.aquarium, R.drawable.artgalleryontario, R.drawable.cntower,
             R.drawable.rom, R.drawable.torontocityhall, R.drawable.torontoeatoncentre,
-            R.drawable.torontozoo, R.drawable.yorkdalemall, R.drawable.hockey_hall_of_fame,
-            R.drawable.aircanadacenter
+            R.drawable.torontozoo, R.drawable.yorkdalemall, R.drawable.hockeyhalloffame,
+            R.drawable.aircanadacentre, R.drawable.batashoemuseum, R.drawable.harbourfrontcentre,
+            R.drawable.ontariosciencecentre
     };
 
     private String[] mPointsOfInterestNames = {
             "Ripley's Aquarium", "Art Gallery of Ontario", "CN Tower",
-            "Royal Ontario Museum", "Toronto City Hall", "Toronto Eaton Center",
+            "Royal Ontario Museum", "Toronto City Hall", "Toronto Eaton Centre",
             "Toronto Zoo", "Yorkdale Mall", "Hockey Hall of Fame",
-            "Air Canada Center"
+            "Air Canada Centre", "Bata Shoe Museum", "Harbourfront Centre", "Ontario Science Centre"
     };
 
     private double mLats[] = {43.642424, 43.653607, 43.642566, 43.66771, 43.65344, 43.653597, 43.817699,
-            43.725887, 43.646988, 43.643466};
+            43.725887, 43.646988, 43.643466, 43.667257, 43.639118, 43.716465};
     private double mLngs[] = {-79.385865, -79.392512, -79.387057, -79.394777, -79.38409, -79.381455, -79.18589,
-            -79.453206, -79.377264, -79.379099};
+            -79.453206, -79.377264, -79.379099, -79.400084, -79.382891, -79.338713};
     private String mURLs[] =
             {"http://www.ripleyaquariums.com/canada/", "http://www.ago.net/", "http://www.cntower.ca/en-ca/home.html",
                     "http://www.rom.on.ca/en", "http://www.toronto.ca/"
                     , "http://www.torontoeatoncentre.com/en/Pages/default.aspx", "http://www.torontozoo.com/",
-                    "http://yorkdale.com/", "http://www.hhof.com/", "http://www.theaircanadacentre.com/"};
+                    "http://yorkdale.com/", "http://www.hhof.com/", "http://www.theaircanadacentre.com/",
+                    "http://www.batashoemuseum.ca/", "http://www.harbourfrontcentre.com/", "http://www.ontariosciencecentre.ca/"
+            };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -103,45 +103,6 @@ public class PointsOfInterestListViewFragment extends Fragment {
 
     public void onDestroyView() {
         super.onDestroyView();
-    }
-
-    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-                                                         int reqWidth, int reqHeight) {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(res, resId, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        return BitmapFactory.decodeResource(res, resId, options);
-    }
-
-    public static int calculateInSampleSize(
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-
-            final int halfHeight = height / 2;
-            final int halfWidth = width / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
     }
 
     class PointsOfInterestComparator implements Comparator<PointOfInterest> {
