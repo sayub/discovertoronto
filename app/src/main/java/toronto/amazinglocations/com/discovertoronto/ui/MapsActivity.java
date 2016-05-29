@@ -6,7 +6,6 @@
 package toronto.amazinglocations.com.discovertoronto.ui;
 
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -22,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.misc.LocationEnabledChecker;
+import toronto.amazinglocations.com.discovertoronto.misc.OptimizedImageLoader;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final int ENABLE_LOCATION_REQUEST = 1;  // The request code.
@@ -41,6 +42,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String mName;
     private double mLat;
     private double mLng;
+    private BitmapDescriptor mPoint;
+    private BitmapDescriptor mSelf;
     private int mLocationUpdateInterval = 5000;
 
     @Override
@@ -99,6 +102,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mSelf = BitmapDescriptorFactory.fromBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
+        mPoint = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+
         buildGoogleApiClient();
     }
 
@@ -111,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
-                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.marker_position)))
+                    .icon(mSelf)
                     .title("You"));
 
             self.showInfoWindow();
@@ -121,7 +127,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Marker pointOfInterest =  mMap.addMarker(new MarkerOptions()
                 .position(new LatLng(mLat, mLng))
-                .icon(BitmapDescriptorFactory.defaultMarker())
+                .icon(mPoint)
                 .title(mName));
         // Adding the position of the point of interest to mBuilder.
         mBuilder.include(pointOfInterest.getPosition());

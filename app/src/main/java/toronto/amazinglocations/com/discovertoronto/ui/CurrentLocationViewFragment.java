@@ -5,7 +5,6 @@
 
 package toronto.amazinglocations.com.discovertoronto.ui;
 
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,12 +24,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import toronto.amazinglocations.com.discovertoronto.R;
+import toronto.amazinglocations.com.discovertoronto.misc.OptimizedImageLoader;
 
 public class CurrentLocationViewFragment extends Fragment implements OnMapReadyCallback {
     private static final String CLASS = CurrentLocationViewFragment.class.getSimpleName();
@@ -41,6 +42,7 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
     private Location mLastLocation;
     private LatLngBounds.Builder mBuilder;
     private int mLocationUpdateInterval = 5000;
+    private BitmapDescriptor mSelf;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(CLASS, "onCreateView()");
@@ -82,6 +84,8 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         // Disabling map scrolling.
         mMap.getUiSettings().setScrollGesturesEnabled(false);
 
+        mSelf = BitmapDescriptorFactory.fromBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
+
         // Starts Google Location services.
         buildGoogleApiClient();
     }
@@ -102,7 +106,7 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
-                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.marker_position)))
+                    .icon(mSelf)
                     .title("You"));
 
             self.showInfoWindow();

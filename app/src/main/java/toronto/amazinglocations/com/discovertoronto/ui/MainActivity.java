@@ -84,15 +84,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTabSelectors = new ArrayList<ImageView>();
         // Getting references to the page tabs and registering listeners for press event.
         ImageView pointsOfInterestTabImageView = (ImageView)findViewById(R.id.pointsOfInterestTabImageView);
-        pointsOfInterestTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.tourist_sign, 30, 30));
+        pointsOfInterestTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.tourist_sign, 20, 20));
         pointsOfInterestTabImageView.setOnClickListener(this);
 
         ImageView bixiBikeLocationsTabImageView = (ImageView)findViewById(R.id.bixiBikeLocationsTabImageView);
-        bixiBikeLocationsTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.bixi, 30, 30));
+        bixiBikeLocationsTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.bixi, 20, 20));
         bixiBikeLocationsTabImageView.setOnClickListener(this);
 
         ImageView navigationTabImageView = (ImageView)findViewById(R.id.navigationTabImageView);
-        navigationTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.nav, 30, 30));
+        navigationTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.nav, 20, 20));
         navigationTabImageView.setOnClickListener(this);
 
         // Adding page tabs to ArrayList.

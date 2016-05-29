@@ -5,7 +5,6 @@
 
 package toronto.amazinglocations.com.discovertoronto.ui;
 
-import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -28,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -54,9 +54,10 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private int mLocationUpdateInterval = 5000;
-    private boolean mBixiLocationsShown = true;
     private ImageView mShowMoreBikeStandLocationsImageView;
     private ImageView mShowLessBikeStandLocationsImageView;
+    private BitmapDescriptor mBixi;
+    private BitmapDescriptor mSelf;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(CLASS, "onCreateView()");
@@ -68,12 +69,12 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
 
         // Pressing on 'mShowMoreBikeStandLocationsImageView' shows more bike locations.
         mShowMoreBikeStandLocationsImageView = (ImageView)v.findViewById(R.id.showMoreBikeStandLocationsImageView);
-        mShowMoreBikeStandLocationsImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.plus, 30, 30));
+        mShowMoreBikeStandLocationsImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.plus, 20, 20));
         mShowMoreBikeStandLocationsImageView.setOnClickListener(this);
 
         // // Pressing on 'mShowLessBikeStandLocationsImageView' shows less bike locations.
         mShowLessBikeStandLocationsImageView = (ImageView)v.findViewById(R.id.showLessBikeStandLocationsImageView);
-        mShowLessBikeStandLocationsImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.minus, 30, 30));
+        mShowLessBikeStandLocationsImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.minus, 20, 20));
         mShowLessBikeStandLocationsImageView.setOnClickListener(this);
 
         return v;
@@ -122,6 +123,9 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
             new BikesLocationReaderAsyncTask(postReadBikesLocationHandler).execute("http://www.bikesharetoronto.com/stations/json");
         }
 
+        mSelf = BitmapDescriptorFactory.fromBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
+        mBixi = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+
         // Starts Google Location services.
         buildGoogleApiClient();
     }
@@ -142,7 +146,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
-                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.marker_position)))
+                    .icon(mSelf)
                     .title("You"));
 
             self.showInfoWindow();
@@ -151,7 +155,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         }
 
         // Needed for boundary object within which all Markers will appear.
-        if (mBixiLocationsShown && sBikeStandLocationLatLngPairs != null) {
+        if (sBikeStandLocationLatLngPairs != null) {
             // If user clicks on the '+' button too many times, 'mNumOfBikeStands' might be bigger than 'sBikeStandLocationLatLngPairs'.
             // The value of 'mNumOfBikeStands' should not be bigger than 'sBikeStandLocationLatLngPairs'.
             if (sNumOfBikeStands > sBikeStandLocationLatLngPairs.size()) {
@@ -166,7 +170,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
                 // Creating Marker from LatLng object at index i of the ArrayList 'mBikeLocationLatLngPairs'.
                 Marker bikeStandMarker = mMap.addMarker(new MarkerOptions()
                         .position(sClosestLatLngPairs.get(i))
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        .icon(mBixi));
 
                 mBuilder.include(bikeStandMarker.getPosition());
             }
