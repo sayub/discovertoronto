@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DiscoverToronto</string>
-    <string name="title_activity_maps">DiscoverToronto</string>
+    <string name="app_name">Discover\nToronto</string>
+    <string name="title_activity_maps">Discover\nToronto</string>
     <string name="gps_network_not_enabled">You need to have location services enabled to use this app.</string>
 </resources>
