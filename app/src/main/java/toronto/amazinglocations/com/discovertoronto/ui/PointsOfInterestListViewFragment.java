@@ -8,6 +8,7 @@ package toronto.amazinglocations.com.discovertoronto.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import toronto.amazinglocations.com.discovertoronto.misc.PointOfInterest;
 import toronto.amazinglocations.com.discovertoronto.misc.PointsOfInterestListViewArrayAdapter;
 
 public class PointsOfInterestListViewFragment extends Fragment {
+    private static final String CLASS = PointsOfInterestListViewFragment.class.getSimpleName();
     private static PointOfInterest sItemsToArray[] = null;
     private PointsOfInterestListViewArrayAdapter mAdapter;
 
@@ -102,6 +104,7 @@ public class PointsOfInterestListViewFragment extends Fragment {
     }
 
     public void onDestroyView() {
+        Log.i(CLASS, "onDestroyView()");
         super.onDestroyView();
     }
 

@@ -9,6 +9,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import java.util.HashMap;
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.ui.RoundImage;
 
@@ -29,6 +37,21 @@ public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfIn
         TextView pointOfInterestTextView;
     }
 
+    private class ImageLoaderAsyncTask extends AsyncTask<Integer, Void, Bitmap> {
+        private ViewHolder mHolder;
+
+        public ImageLoaderAsyncTask(ViewHolder holder) {
+            mHolder = holder;
+        }
+        protected Bitmap doInBackground(Integer... imageResourceId) {
+            //return BitmapFactory.decodeResource(mContext.getResources(), imageResourceId[0]);
+            return decodeSampledBitmapFromResource(mContext.getResources(), imageResourceId[0], 30, 30);
+        }
+        protected void onPostExecute(Bitmap image) {
+            mHolder.pointOfInterestImageView.setImageDrawable(new RoundImage(image));
+        }
+    }
+
     public PointsOfInterestListViewArrayAdapter(Context context, int layoutResourceId, PointOfInterest items[]) {
         super(context, layoutResourceId, items);
 
@@ -38,24 +61,26 @@ public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfIn
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        View rowView = convertView;
+        final ViewHolder holder;
         // Reuse views
-        if (rowView == null) {
+        if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            rowView = inflater.inflate(R.layout.listview_row, null);
+            convertView = inflater.inflate(R.layout.listview_row, null);
+
             // Configure view holder
-            ViewHolder viewHolder = new ViewHolder();
-            viewHolder.pointOfInterestImageView = (ImageView) rowView.findViewById(R.id.pointOfInterestImageView);
-            viewHolder.pointOfInterestTextView = (TextView) rowView.findViewById(R.id.pointOfInterestTextView);
-            rowView.setTag(viewHolder);
+            holder = new ViewHolder();
+            holder.pointOfInterestImageView = (ImageView) convertView.findViewById(R.id.pointOfInterestImageView);
+            holder.pointOfInterestTextView = (TextView) convertView.findViewById(R.id.pointOfInterestTextView);
+            new ImageLoaderAsyncTask(holder).execute(new Integer(mItems[position].getImageResourceId()));
+            holder.pointOfInterestTextView.setText(mItems[position].getName());
+            convertView.setTag(holder);
+        }
+        else {
+            // Fill data
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        // Fill data
-        ViewHolder holder = (ViewHolder) rowView.getTag();
-        new ImageLoaderAsyncTask(holder).execute(new Integer(mItems[position].getImageResourceId()));
-        holder.pointOfInterestTextView.setText(mItems[position].getName());
-
-        return rowView;
+        return convertView;
     }
 
     public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
@@ -97,19 +122,25 @@ public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfIn
         return inSampleSize;
     }
 
-    private class ImageLoaderAsyncTask extends AsyncTask<Integer, Void, Bitmap> {
-        private ViewHolder mHolder;
+    public Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
 
-        public ImageLoaderAsyncTask(ViewHolder holder) {
-            mHolder = holder;
-        }
-        protected Bitmap doInBackground(Integer... imageResourceId) {
-            //return BitmapFactory.decodeResource(mContext.getResources(), imageResourceId[0]);
-            return decodeSampledBitmapFromResource(mContext.getResources(), imageResourceId[0], 50, 50);
-        }
-        protected void onPostExecute(Bitmap image) {
-            RoundImage pointOfInterestImage = new RoundImage(image);
-            mHolder.pointOfInterestImageView.setImageDrawable(pointOfInterestImage);
-        }
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = 12;
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
     }
 }
