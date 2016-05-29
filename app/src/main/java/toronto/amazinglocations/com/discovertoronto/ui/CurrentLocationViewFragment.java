@@ -5,6 +5,7 @@
 
 package toronto.amazinglocations.com.discovertoronto.ui;
 
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -84,7 +86,14 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         // Disabling map scrolling.
         mMap.getUiSettings().setScrollGesturesEnabled(false);
 
-        mSelf = BitmapDescriptorFactory.fromBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
+        // Retrieving the layout inflater service and inflating the self_marker_layout.
+        View selfMarker = ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.self_marker_layout, null);
+        // Retrieving a handle to 'markerImageView'.
+        ImageView markerImageView = (ImageView)selfMarker.findViewById(R.id.markerImageView);
+        // Setting the Bitmap for 'markerImageView'.
+        markerImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
+
+        mSelf = BitmapDescriptorFactory.fromBitmap(RoundImage.createDrawableFromView(getActivity(), selfMarker));
 
         // Starts Google Location services.
         buildGoogleApiClient();
@@ -106,10 +115,8 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
-                    .icon(mSelf)
-                    .title("You"));
+                    .icon(mSelf));
 
-            self.showInfoWindow();
             // Adding self to mBuilder.
             mBuilder.include(self.getPosition());
         }

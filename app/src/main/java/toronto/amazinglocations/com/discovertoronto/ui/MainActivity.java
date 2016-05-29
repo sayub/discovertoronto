@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -36,6 +37,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     protected void onResume() {
         super.onResume();
+
+        // Keeping the screen on.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         boolean isLocationEnabled = LocationEnabledChecker.isLocationEnabled(this);
         // If Google location is not enabled, need to show the Activity from which user can enable it.

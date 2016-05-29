@@ -5,11 +5,16 @@
 
 package toronto.amazinglocations.com.discovertoronto.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -54,6 +59,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     protected void onResume() {
         super.onResume();
+
+        // Keeping the screen on.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         boolean isLocationEnabled = LocationEnabledChecker.isLocationEnabled(this);
         // If Google location is not enabled, need to show the Activity from which user can enable it.
@@ -101,10 +109,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        mSelf = BitmapDescriptorFactory.fromBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
-        mPoint = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
-
+        // Retrieving the layout inflater service and inflating the self_marker_layout.
+        View selfMarker = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.self_marker_layout, null);
+        // Retrieving a handle to 'markerImageView'.
+        ImageView markerImageView = (ImageView)selfMarker.findViewById(R.id.markerImageView);
+        // Setting the Bitmap for 'markerImageView'.
+        markerImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.marker_position, 15, 15));
+        // Creating a Drawable from 'selfMarker' and turning it into a BitmapDescriptor.
+        mSelf = BitmapDescriptorFactory.fromBitmap(RoundImage.createDrawableFromView(this, selfMarker));
+        // Creating a BitmapDescriptor for the location of the 'point of interest'.
+        mPoint = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory. HUE_VIOLET);
+        // Calling buildGoogleApiClient() to set up Location callbacks.
         buildGoogleApiClient();
     }
 
@@ -117,10 +132,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (currentUserLocation != null) {
             Marker self = mMap.addMarker(new MarkerOptions()
                     .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
-                    .icon(mSelf)
-                    .title("You"));
+                    .icon(mSelf));
 
-            self.showInfoWindow();
             // Adding self to mBuilder.
             mBuilder.include(self.getPosition());
         }
@@ -129,6 +142,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .position(new LatLng(mLat, mLng))
                 .icon(mPoint)
                 .title(mName));
+        // Showing the name of the 'point of interest'.
+        pointOfInterest.showInfoWindow();
+
         // Adding the position of the point of interest to mBuilder.
         mBuilder.include(pointOfInterest.getPosition());
 

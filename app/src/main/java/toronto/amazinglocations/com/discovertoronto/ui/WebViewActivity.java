@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -24,6 +25,9 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
 
     protected void onResume() {
         super.onResume();
+
+        // Keeping the screen on.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mRightShimmerView = (ShimmerView)findViewById(R.id.rightShimmerView);
         mRightShimmerView.startAnimation();
