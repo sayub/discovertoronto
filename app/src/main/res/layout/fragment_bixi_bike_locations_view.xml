@@ -17,7 +17,6 @@
             android:id="@+id/showMoreBikeStandLocationsImageView"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/plus"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:paddingRight="10dp"
@@ -29,14 +28,12 @@
             android:layout_height="60dp"
             android:layout_margin="10dp"
             android:padding="10dp"
-            android:src="@drawable/bixi"
             android:background="@drawable/circular_shape"
         />
         <ImageView
             android:id="@+id/showLessBikeStandLocationsImageView"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/minus"
             android:paddingLeft="10dp"
             android:paddingBottom="10dp"
             android:paddingRight="10dp"

@@ -19,6 +19,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.misc.LocationEnabledChecker;
+import toronto.amazinglocations.com.discovertoronto.misc.OptimizedImageLoader;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int ENABLE_LOCATION_REQUEST = 1;  // The request code.
@@ -83,12 +84,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTabSelectors = new ArrayList<ImageView>();
         // Getting references to the page tabs and registering listeners for press event.
         ImageView pointsOfInterestTabImageView = (ImageView)findViewById(R.id.pointsOfInterestTabImageView);
+        pointsOfInterestTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.tourist_sign, 30, 30));
         pointsOfInterestTabImageView.setOnClickListener(this);
 
         ImageView bixiBikeLocationsTabImageView = (ImageView)findViewById(R.id.bixiBikeLocationsTabImageView);
+        bixiBikeLocationsTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.bixi, 30, 30));
         bixiBikeLocationsTabImageView.setOnClickListener(this);
 
         ImageView navigationTabImageView = (ImageView)findViewById(R.id.navigationTabImageView);
+        navigationTabImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getResources(), R.drawable.nav, 30, 30));
         navigationTabImageView.setOnClickListener(this);
 
         // Adding page tabs to ArrayList.

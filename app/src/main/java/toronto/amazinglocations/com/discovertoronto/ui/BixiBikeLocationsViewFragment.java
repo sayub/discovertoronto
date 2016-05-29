@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.misc.BikeLocationsArrayList;
 import toronto.amazinglocations.com.discovertoronto.misc.BikesLocationReaderAsyncTask;
+import toronto.amazinglocations.com.discovertoronto.misc.OptimizedImageLoader;
 
 public class BixiBikeLocationsViewFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
     private static final String CLASS = BixiBikeLocationsViewFragment.class.getSimpleName();
@@ -62,12 +63,17 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
 
         View v = inflater.inflate(R.layout.fragment_bixi_bike_locations_view, container, false);
 
+        ImageView bikeImageView = (ImageView)v.findViewById(R.id.bikeImageView);
+        bikeImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.bixi, 30, 30));
+
         // Pressing on 'mShowMoreBikeStandLocationsImageView' shows more bike locations.
         mShowMoreBikeStandLocationsImageView = (ImageView)v.findViewById(R.id.showMoreBikeStandLocationsImageView);
+        mShowMoreBikeStandLocationsImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.plus, 30, 30));
         mShowMoreBikeStandLocationsImageView.setOnClickListener(this);
 
         // // Pressing on 'mShowLessBikeStandLocationsImageView' shows less bike locations.
         mShowLessBikeStandLocationsImageView = (ImageView)v.findViewById(R.id.showLessBikeStandLocationsImageView);
+        mShowLessBikeStandLocationsImageView.setImageBitmap(OptimizedImageLoader.decodeSampledBitmapFromResource(getActivity().getResources(), R.drawable.minus, 30, 30));
         mShowLessBikeStandLocationsImageView.setOnClickListener(this);
 
         return v;
