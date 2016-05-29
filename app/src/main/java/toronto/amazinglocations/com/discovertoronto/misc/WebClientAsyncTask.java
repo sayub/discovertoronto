@@ -17,10 +17,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class BikesLocationReaderAsyncTask extends AsyncTask<String, Void, String> {
+public class WebClientAsyncTask extends AsyncTask<String, Void, String> {
     private Handler mPostExecuteHandler;
 
-    public BikesLocationReaderAsyncTask(Handler postExecuteHandler) {
+    public WebClientAsyncTask(Handler postExecuteHandler) {
         mPostExecuteHandler = postExecuteHandler;
     }
 

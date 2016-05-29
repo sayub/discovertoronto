@@ -9,13 +9,15 @@
         android:gravity="center"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:text="You"/>
-
+        android:textColor="@color/colorWhite"
+        android:text="You"
+        android:background="@color/colorDarkTransluscent"
+    />
     <ImageView
         android:id="@+id/markerImageView"
         android:layout_width="50dp"
         android:layout_height="25dp"
-        android:background="#00FFFFFF"
+        android:background="@color/colorTransluscent"
         android:gravity="center"
     />
 </LinearLayout>

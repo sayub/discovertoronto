@@ -40,7 +40,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.misc.BikeLocationsArrayList;
-import toronto.amazinglocations.com.discovertoronto.misc.BikesLocationReaderAsyncTask;
+import toronto.amazinglocations.com.discovertoronto.misc.WebClientAsyncTask;
 import toronto.amazinglocations.com.discovertoronto.misc.OptimizedImageLoader;
 
 public class BixiBikeLocationsViewFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
@@ -121,7 +121,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         // Using AsyncTask to fetch bixi bike locations. The information returned is stored in the static
         // 'sBikeStandLocationLatLngPairs'
         if (sBikeStandLocationLatLngPairs == null) {
-            new BikesLocationReaderAsyncTask(postReadBikesLocationHandler).execute("http://www.bikesharetoronto.com/stations/json");
+            new WebClientAsyncTask(postReadBikesLocationHandler).execute("http://www.bikesharetoronto.com/stations/json");
         }
 
         // Retrieving the layout inflater service and inflating the self_marker_layout.
