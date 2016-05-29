@@ -15,7 +15,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,14 +22,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import java.util.HashMap;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import toronto.amazinglocations.com.discovertoronto.R;
 import toronto.amazinglocations.com.discovertoronto.ui.RoundImage;
 
 public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfInterest> {
     private Context mContext;
     private int mLayoutResourceId;
-    private PointOfInterest mItems[];
+    private List<PointOfInterest> mItems;
 
     static class ViewHolder {
         ImageView pointOfInterestImageView;
@@ -52,7 +54,7 @@ public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfIn
         }
     }
 
-    public PointsOfInterestListViewArrayAdapter(Context context, int layoutResourceId, PointOfInterest items[]) {
+    public PointsOfInterestListViewArrayAdapter(Context context, int layoutResourceId, List<PointOfInterest> items) {
         super(context, layoutResourceId, items);
 
         mContext = context;
@@ -71,14 +73,16 @@ public class PointsOfInterestListViewArrayAdapter extends ArrayAdapter<PointOfIn
             holder = new ViewHolder();
             holder.pointOfInterestImageView = (ImageView) convertView.findViewById(R.id.pointOfInterestImageView);
             holder.pointOfInterestTextView = (TextView) convertView.findViewById(R.id.pointOfInterestTextView);
-            new ImageLoaderAsyncTask(holder).execute(new Integer(mItems[position].getImageResourceId()));
-            holder.pointOfInterestTextView.setText(mItems[position].getName());
+
             convertView.setTag(holder);
         }
         else {
             // Fill data
             holder = (ViewHolder) convertView.getTag();
         }
+
+        new ImageLoaderAsyncTask(holder).execute(new Integer(mItems.get(position).getImageResourceId()));
+        holder.pointOfInterestTextView.setText(mItems.get(position).getName());
 
         return convertView;
     }
