@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Discover\nToronto</string>
     <string name="gps_network_not_enabled">You need to have location services enabled to use this app.</string>
-
+    <string name="app_termination_notice">Since location services was not turned on, app was terminated.</string>
 </resources>

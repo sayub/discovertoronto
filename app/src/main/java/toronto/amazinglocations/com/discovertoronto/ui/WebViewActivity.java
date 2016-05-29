@@ -33,7 +33,6 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
         mRightShimmerView.startAnimation();
 
         String url = getIntent().getExtras().getString("url");
-
         WebView pointOfInterestWebView = (WebView)findViewById(R.id.pointOfInterestWebView);
         pointOfInterestWebView.setWebViewClient(new WebViewClient());
         pointOfInterestWebView.loadUrl(url);
@@ -52,9 +51,7 @@ public class WebViewActivity extends AppCompatActivity implements View.OnClickLi
 
     public void onClick(View v) {
         Intent mapIntent = new Intent(this, MapsActivity.class);
-
         mapIntent.putExtras(getIntent().getExtras());
-
         startActivity(mapIntent);
     }
 }

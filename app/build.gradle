@@ -7,8 +7,8 @@ android {
         applicationId "toronto.amazinglocations.com.discovertoronto"
         minSdkVersion 17
         targetSdkVersion 22
-        versionName '1.2'
-        versionCode 2
+        versionName '1.3'
+        versionCode 3
     }
     buildTypes {
         release {

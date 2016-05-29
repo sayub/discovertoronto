@@ -77,6 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             enableActivity();
         }
         else {
+            Toast.makeText(this, getResources().getString(R.string.app_termination_notice), Toast.LENGTH_LONG).show();
             finish();
         }
     }

@@ -43,8 +43,9 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
     private LocationRequest mLocationRequest;
     private Location mLastLocation;
     private LatLngBounds.Builder mBuilder;
-    private int mLocationUpdateInterval = 5000;
+    private boolean mDefaultZoomReached = false;
     private BitmapDescriptor mSelf;
+    private int mLocationUpdateInterval = 5000;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(CLASS, "onCreateView()");
@@ -108,28 +109,20 @@ public class CurrentLocationViewFragment extends Fragment implements OnMapReadyC
 
         mMap.clear();
 
-        // Creates a boundary in terms of latitudes and longitudes.
-        mBuilder = new LatLngBounds.Builder();
-
         // Adding this user's current Location Marker to the map.
         if (currentUserLocation != null) {
+            // Retrieving user's current latitude and longitude, and creating LatLng object from the pair.
+            LatLng currentLatLng = new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude());
+            // Creating marker on the map representing user's current location.
             Marker self = mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()))
+                    .position(currentLatLng)
                     .icon(mSelf));
-
-            // Adding self to mBuilder.
-            mBuilder.include(self.getPosition());
+            // If the view is zoomed once, it would not zoom again until the Fragment's onDestroy() is called.
+            if (!mDefaultZoomReached) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude()), 14.0f));
+                mDefaultZoomReached = !mDefaultZoomReached;
+            }
         }
-
-        // Creates the boundary object.
-        LatLngBounds bounds = mBuilder.build();
-
-        // offset from edges of the map in pixels.
-        int padding = 80;
-
-        // Centering the boundary within the screen.
-        final CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-        mMap.moveCamera(cu);
     }
 
     public void buildGoogleApiClient() {
