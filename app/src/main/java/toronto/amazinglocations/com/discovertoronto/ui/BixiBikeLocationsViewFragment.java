@@ -88,7 +88,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         FragmentManager fm = getChildFragmentManager();
         // Getting the child map Fragment and getting it ready by calling getMapAsync().
         mSupportMapFragment = (SupportMapFragment) fm.findFragmentByTag("bixiMapFragment");
-        //
+
         if (mSupportMapFragment == null) {
             mSupportMapFragment = new SupportMapFragment();
             FragmentTransaction ft = fm.beginTransaction();
@@ -219,6 +219,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, locationListener);
     }
 
+    // Before requestLocationUpdates can be called, the LocationRequest object needs to be configured.
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(mLocationUpdateInterval);
@@ -253,6 +254,7 @@ public class BixiBikeLocationsViewFragment extends Fragment implements OnMapRead
         }
     };
 
+    // This was set up from startLocationUpdates.
     LocationListener locationListener = new LocationListener(){
         public void onLocationChanged(Location location) {
             mLastLocation = location;

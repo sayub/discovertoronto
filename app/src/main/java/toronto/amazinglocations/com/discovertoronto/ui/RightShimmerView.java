@@ -14,13 +14,13 @@ import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import toronto.amazinglocations.com.discovertoronto.R;
 
-public class ShimmerView extends RelativeLayout {
+public class RightShimmerView extends RelativeLayout {
     private Context mContext;
     private View mView;
     private RelativeLayout mRl;
     private Animation mAnim;
 
-    public ShimmerView(Context context, AttributeSet attrs) {
+    public RightShimmerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         
         mContext = context;

@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="test.fragment.com.fragmenttest.MainActivity">
+    tools:context="toronto.amazinglocations.com.discovertoronto.ui.MainActivity">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
